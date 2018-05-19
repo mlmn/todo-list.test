@@ -23,7 +23,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = '';
+//localhost version
+$config['base_url'] = 'http://todo-list.test';
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,7 @@ $config['base_url'] = '';
 | variable so that it is blank.
 |
 */
+//index.php removed
 $config['index_page'] = '';
 
 /*

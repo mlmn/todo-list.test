@@ -1,0 +1,31 @@
+.greyhead {
+	background-color: #24292e;
+	color: #bbb;
+	padding-top:7px;
+	min-height: 42px;
+}
+
+.header-notice {
+	margin-top: 3px;
+}
+
+.login-errors {
+	padding-bottom:5px;
+	color: red;
+}
+
+.regwell {
+	margin-top: 20px;
+}
+
+.username-bold {
+	color:white;
+	font-weight: bold;
+	margin-right: 7px;
+}
+
+.logout-link {
+	border: 1px solid white;
+	padding: 0px 3px 2px 3px;
+	border-radius: 4px;
+}
