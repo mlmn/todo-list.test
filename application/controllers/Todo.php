@@ -9,7 +9,8 @@ class Todo extends CI_Controller {
 		if ($this->session->userdata('logined') != true) {
 			redirect('/user/login');
 		} else {
-			$this->user = $this->common->getItem('users', ['username' => $this->session->userdata('username')]);
+			$this->user = $this->session->userdata('user');
+			//cd($this->user);
 		}
 	}
 
@@ -43,13 +44,18 @@ class Todo extends CI_Controller {
 		$this->load->view('footer');
 	}
 
-	public function list(int $id) {
-		$viewData['list'] = $this->common->getItems('list_items', ['list_id' => $id]);
-		cd($viewData);
+	public function list($id) {
+		$viewData['list'] = $this->common->getItems('list_items', ['list_id' => (int)$id]);
+
+
+		$this->load->view('header');
+		$this->load->view('logoutNav');
+		$this->load->view('listItems', $viewData);
+		$this->load->view('footer');
 	}
 
-	public function deleteList(int $id) {
-		if ($listToDelete = $this->common->getItem('lists', ['id' => $id, 'user_id' => $this->user['id']])) {
+	public function deleteList($id) {
+		if ($listToDelete = $this->common->getItem('lists', ['id' => (int)$id, 'user_id' => $this->user['id']])) {
 			$this->common->updateItem('lists', ['id' => $id], ['del' => 1]);			
 		}
 		redirect('/');

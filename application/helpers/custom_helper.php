@@ -6,3 +6,9 @@ if (!function_exists('cd')) {
 		exit;
 	}
 }
+
+if (!function_exists('xssc')) {
+	function xssc($var){
+		return htmlspecialchars($var);
+	}
+}

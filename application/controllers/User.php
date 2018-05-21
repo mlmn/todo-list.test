@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class User extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
-		
+
 	}
 
 	public function register() {
@@ -57,7 +57,7 @@ class User extends CI_Controller {
 
 			if ($this->user = $this->common->getItem('users', $userData)) {
 				$this->session->set_userdata('logined', true);
-				$this->session->set_userdata('username', $userData['username']);
+				$this->session->set_userdata('user', $this->user);
 				redirect('/todo/');
 			} else {
 				$this->loginError = true;

@@ -15,8 +15,7 @@
 							<a href="todo/list/<?=$list['id'];?>"><?=$list['list_name'];?></a>
 						</div>
 						<div class="col-md-2">
-							<a class="float-right" href="todo/deleteList/<?=$list['id'];?>">Удалить</a>
-							
+							<a class="float-right" href="/todo/deleteList/<?=$list['id'];?>">Удалить</a>
 						</div>
 					</div>
 

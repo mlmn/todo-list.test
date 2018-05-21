@@ -51,4 +51,10 @@ class Common extends CI_Model {
 	public function hashPass(string $password) {
 		return hash('sha256', $password);		
 	}
+
+	public function getListItems($listId) {
+		$this->db->select('*');
+		$this->db->from('list_items');
+	}
+
 }
