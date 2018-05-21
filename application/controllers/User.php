@@ -10,28 +10,32 @@ class User extends CI_Controller {
 		$this->form_validation->set_error_delimiters('<div class="registration-error">', '</div><hr>');
 		$this->form_validation->set_rules(
 			'login', 'Логин',
-			'required|min_length[3]|max_length[12]|is_unique[users.username]|callback_userDataCheck',
+			'required|min_length[3]|max_length[12]|is_unique[users.username]|regex_match[/^[\w]+$/]',
 			array(
 				'required'      			=> 'Поле %s обязательно.',
 				'is_unique'     			=> 'Этот логин уже занят.',
 				'min_length'    			=> 'Длина логина от 3 до 12 символов.',
 				'max_length'    			=> 'Длина логина от 3 до 12 символов.',
-				'userDataCheck'				=> 'Допустимые символы логина: A-Z a-z 0-9 _',
+				'regex_match'				=> 'Допустимые символы логина: A-Z a-z 0-9 _',
 			)
 		);
 		$this->form_validation->set_rules(
 			'password', 'Пароль',
-			'required|min_length[6]|max_length[20]|callback_userDataCheck',
+			'required|min_length[6]|max_length[20]|regex_match[/^[\w]+$/]',
 			array(
 				'required'      	=> 'Поле %s обязательно.',			
 				'min_length'    	=> 'Длина пароля от 6 до 20 символов.',
 				'max_length'    	=> 'Длина пароля от 6 до 20 символов.',
-				'userDataCheck'		=> 'Допустимые символы пароля: A-Z a-z 0-9 _',
+				'regex_match'		=> 'Допустимые символы пароля: A-Z a-z 0-9 _',
 			)
 		);
 
 		if ($this->form_validation->run() == true) {
-			$this->users->addUser($this->input->post());
+			$inputData = $this->input->post();
+			$userData['username'] = $inputData['login'];
+			$userData['hash'] = $this->common->hashPass($inputData['password']);
+			//cd($inputData);
+			$this->common->addItem('users', $userData);
 			redirect('/todo/');	
 		}
 
@@ -42,23 +46,24 @@ class User extends CI_Controller {
 
 	public function login() {
 		$this->form_validation->set_error_delimiters('<div class="login-error">', '</div>');
-		$this->form_validation->set_rules('login', 'login', 'required');
+		$this->form_validation->set_rules('login', 'login', 'required|regex_match[/^[\w]+$/]');
 		$this->form_validation->set_rules('password', 'password', 'required');
 
 		if ($this->form_validation->run() == true) {
 
-			$userData['login'] = $this->input->post('login');
-			$userData['password'] = $this->input->post('password');
-			if ($this->user = $this->users->checkUser($userData)) {
+			$userData['username'] = $this->input->post('login');
+			$userData['hash'] = $this->common->hashPass($this->input->post('password'));
+
+			if ($this->user = $this->common->getItem('users', $userData)) {
 				$this->session->set_userdata('logined', true);
-				$this->session->set_userdata('username', $userData['login']);
+				$this->session->set_userdata('username', $userData['username']);
 				redirect('/todo/');
 			} else {
 				$this->loginError = true;
 			}
 		}
 		$this->load->view('header');
-		$this->load->view('login_register');
+		$this->load->view('loginNav');
 		$this->load->view('welcome');
 		$this->load->view('footer');
 	}
@@ -68,14 +73,6 @@ class User extends CI_Controller {
 		redirect('/todo/');
 	}
 
-
-	public function userDataCheck($str) {
-		if(preg_match('/^[\w]+$/', $str)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 }
 
