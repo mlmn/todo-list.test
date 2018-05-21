@@ -5,6 +5,7 @@ class Todo extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
+		$this->output->enable_profiler(TRUE);
 		if ($this->session->userdata('logined') != true) {
 			redirect('/user/login');
 		} else {
@@ -17,7 +18,7 @@ class Todo extends CI_Controller {
 		$this->form_validation->set_error_delimiters('<div class="list-error">', '</div><hr>');
 		$this->form_validation->set_rules(
 			'newList', 'Название списка',
-			'required|min_length[3]|max_length[120]|regex_match[/^[\w\s\.а-яёА-ЯЁ]+$/]',
+			'required|min_length[3]|max_length[120]|regex_match[/^[\w\s\.а-яёА-ЯЁ]+$/u]',
 			array(
 				'required'      			=> 'Поле %s обязательно.',
 				'min_length'    			=> 'Длина названия от 3 до 120 символов.',
@@ -34,7 +35,7 @@ class Todo extends CI_Controller {
 		}
 
 
-		$viewData['lists'] = $this->common->getItems('lists', ['user_id' => $this->user['id']]);
+		$viewData['lists'] = $this->common->getItems('lists', ['user_id' => $this->user['id'], 'del' => 0]);
 
 		$this->load->view('header');
 		$this->load->view('logoutNav');
@@ -42,14 +43,16 @@ class Todo extends CI_Controller {
 		$this->load->view('footer');
 	}
 
-	public function list($id) {
+	public function list(int $id) {
 		$viewData['list'] = $this->common->getItems('list_items', ['list_id' => $id]);
-
-		var_dump($viewData);
+		cd($viewData);
 	}
 
-	public function deleteList($id) {
-
+	public function deleteList(int $id) {
+		if ($listToDelete = $this->common->getItem('lists', ['id' => $id, 'user_id' => $this->user['id']])) {
+			$this->common->updateItem('lists', ['id' => $id], ['del' => 1]);			
+		}
+		redirect('/');
 	}
 
 }

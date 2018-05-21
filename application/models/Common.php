@@ -2,7 +2,7 @@
 
 class Common extends CI_Model {
 
-	public function getItem($table, array $selectors) {
+	public function getItem(string $table, array $selectors) {
 		$this->db->select('*');
 		$this->db->from($table);
 		foreach ($selectors as $column => $match) {
@@ -16,7 +16,7 @@ class Common extends CI_Model {
 		}
 	}
 
-	public function getItems($table, array $selectors) {
+	public function getItems(string $table, array $selectors) {
 		$this->db->select('*');
 		$this->db->from($table);
 		foreach ($selectors as $column => $match) {
@@ -30,7 +30,7 @@ class Common extends CI_Model {
 		}
 	}
 
-	public function addItem($table, $data) {
+	public function addItem(string $table, array $data) {
 		$insertData=[];
 		foreach ($data as $col => $value) {
 			$insertData[$col] = $this->db->escape_str($value);
@@ -38,7 +38,17 @@ class Common extends CI_Model {
 		$this->db->insert($table, $insertData);
 	}
 
-	public function hashPass($password) {
+	public function updateItem(string $table, array $selectors, array $data) {
+		foreach ($data as $col => $value) {
+			$updateData[$col] = $this->db->escape_str($value);
+		}
+		foreach ($selectors as $column => $match) {
+			$this->db->where($column, $this->db->escape_str($match));
+		}
+		$this->db->update($table, $updateData);
+	}
+
+	public function hashPass(string $password) {
 		return hash('sha256', $password);		
 	}
 }
