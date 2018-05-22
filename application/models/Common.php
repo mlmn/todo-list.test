@@ -36,6 +36,7 @@ class Common extends CI_Model {
 			$insertData[$col] = $this->db->escape_str($value);
 		}
 		$this->db->insert($table, $insertData);
+		return $this->db->insert_id();
 	}
 
 	public function updateItem(string $table, array $selectors, array $data) {

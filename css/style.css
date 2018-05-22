@@ -33,3 +33,10 @@
 .list-names {
 	list-style: none;
 }
+
+.list-item {
+	list-style: none;
+	border: 1px solid grey;
+	margin-bottom:2px;
+	padding:5px;
+}

@@ -5,7 +5,7 @@ class Todo extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
-		$this->output->enable_profiler(TRUE);
+		//$this->output->enable_profiler(TRUE);
 		if ($this->session->userdata('logined') != true) {
 			redirect('/user/login');
 		} else {
@@ -32,7 +32,8 @@ class Todo extends CI_Controller {
 		if ($this->form_validation->run() == true) {
 			$listData['list_name'] = $this->input->post('newList');
 			$listData['user_id'] = $this->user['id'];
-			$this->common->addItem('lists', $listData);
+			$newListId = $this->common->addItem('lists', $listData);
+			redirect('/todo/list/' . $newListId);
 		}
 
 
@@ -45,7 +46,49 @@ class Todo extends CI_Controller {
 	}
 
 	public function list($id) {
-		$viewData['list'] = $this->common->getItems('list_items', ['list_id' => (int)$id]);
+		$viewData['list'] =  $this->common->getItem('lists', ['id' => (int)$id]);
+
+		//cd($viewData['list']);
+
+		if ($post = $this->input->post()) {
+			//cd($post);
+			if ($post['requestType'] == "newItem") {
+				//если хотим добавить новый элемент в список
+				if ($viewData['list']['user_id'] == $this->user['id']) {
+					//cd($post);
+					if (!empty($post['itemText'])) {
+						//если новый элемент списка в запросе не пустой
+						$insertList = ['list_id' => $post['listId'], 'text' => $post['itemText']];
+						$this->common->addItem('items', $insertList);
+					}
+
+					$items = $this->common->getItems('items', ['list_id' => (int)$id]);
+					//cd($listItems);	
+					$responce = [
+						'sucsess' => true, 
+						'items' => $items,
+					];
+
+					$json = json_encode($responce);
+					echo($json);
+					exit;
+				}
+
+			} elseif ($post['requestType'] == "updateItem") {
+				//редактирование существующего элемента списка
+
+			} elseif ($post['requestType'] == "addImage") {
+				//добавление или замена картинки к элементу списка
+
+			} elseif ($post['requestType'] == "deleteIimage") {
+				//удаление картинки
+
+			}
+
+
+		}
+
+		$viewData['listItems'] = $this->common->getItems('items', ['list_id' => (int)$id]);
 
 
 		$this->load->view('header');
@@ -60,5 +103,7 @@ class Todo extends CI_Controller {
 		}
 		redirect('/');
 	}
+
+
 
 }
