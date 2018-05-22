@@ -37,6 +37,10 @@
 .list-item {
 	list-style: none;
 	border: 1px solid grey;
-	margin-bottom:2px;
-	padding:5px;
+	margin-bottom: 4px;
+	padding: 7px;
+}
+
+.list-body {
+	padding: 0;
 }

@@ -1,5 +1,6 @@
 var listBody = document.querySelector('#listBody');
 //var listBody = document.getElementById("#listBody");
+sendListItem();
 
 function sendListItem() {
 	// 1. Создаём новый объект XMLHttpRequest
