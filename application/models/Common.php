@@ -9,7 +9,7 @@ class Common extends CI_Model {
 			$this->db->where($column, $this->db->escape_str($match));
 		}
 		$query = $this->db->get();
-		if ($query->num_rows() == 1) {
+		if ($query->num_rows() > 0) {
 			return $query->row_array();
 		} else {
 			return false;
@@ -40,6 +40,7 @@ class Common extends CI_Model {
 	}
 
 	public function updateItem(string $table, array $selectors, array $data) {
+		$updateData=[];
 		foreach ($data as $col => $value) {
 			$updateData[$col] = $this->db->escape_str($value);
 		}
@@ -47,6 +48,14 @@ class Common extends CI_Model {
 			$this->db->where($column, $this->db->escape_str($match));
 		}
 		$this->db->update($table, $updateData);
+	}
+
+	public function replaceItem(string $table, array $data) {
+		$replaceData = [];
+		foreach ($data as $col => $value) {
+			$replaceData[$col] = $this->db->escape_str($value);
+		}
+		$this->db->replace($table, $replaceData);
 	}
 
 	public function hashPass(string $password) {

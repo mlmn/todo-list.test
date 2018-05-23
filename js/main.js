@@ -7,10 +7,10 @@ function sendListItem(itemid) {
 	var xhr = new XMLHttpRequest();
 
 	//var body = 'name=' + encodeURIComponent(listItem);
-	console.log(document.forms);
+	//console.log(document.forms);
 	var formData = new FormData(document.forms[itemid]);
-	console.log(formData);
-	xhr.open('POST', '', true);
+	//console.log(formData);
+	xhr.open('POST', '/todo/ajax', true);
 	xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 	// 3. Отсылаем запрос
 	xhr.send(formData);
@@ -25,7 +25,7 @@ function sendListItem(itemid) {
 			//alert(xhr.responseText);
 
 			var responce = JSON.parse(xhr.responseText);
-			console.log(responce);
+			//console.log(responce);
 			var bodyHtml = ''; 
 			responce.items.forEach(function(item, i, arr) {
 				bodyHtml += '<li class="list-item" id="itemid' + item.id + '"><span onclick="editListItem(' + item.list_id +',' + item.id + ')">' + item.text + '</span></li><hr>';
@@ -43,7 +43,7 @@ function sendListItem(itemid) {
 
 function editListItem(listid, itemid) {
 	var itemBody = document.querySelector('#itemid'+ itemid);
-	console.log(itemBody);
+	//console.log(itemBody);
 		//у этой формы есть дубликат во вьюхе('listItems'), нужно избавиться.
 		var itemEdit =  '<div class="row">' +
 							'<div class="col-md-10">' +
@@ -52,13 +52,14 @@ function editListItem(listid, itemid) {
 									'<input type="hidden" name="itemId" class="form-control" value="' + itemid + '">' +
 									'<input type="hidden" name="listId" class="form-control" value="' + listid + '">' +
 									'<input type="text" name="itemText" class="form-control" value="' + itemBody.innerText + '">' +
+									'<input type="file" name="fileUpload" class="form-control-file">' +
 								'</div></form>' +
 							'</div>' +
 							'<div class="col-md-2">' +
-								'<button onclick="sendListItem(\'formItem'+ itemid + '\')" id="button" class="btn btn-primary mb-2">Редактировать пункт</button>' +
+								'<button onclick="sendListItem(\'formItem'+ itemid + '\')" id="button" class="btn btn-primary mb-2">сохранить</button>' +
 							'</div>' +
 						'</div>';
 	
 	itemBody.innerHTML = itemEdit;
-	console.log(document.forms);
+	//console.log(document.forms);
 }

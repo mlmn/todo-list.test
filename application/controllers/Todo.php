@@ -53,11 +53,19 @@ class Todo extends CI_Controller {
 		}
 		//cd($viewData['list']);
 
+
+
+		$this->load->view('header');
+		$this->load->view('logoutNav');
+		$this->load->view('listItems', $viewData);
+		$this->load->view('footer');
+	}
+
+	public function ajax() {
 		if ($post = $this->input->post()) {
 			//cd($post);
 			if ($post['requestType'] == "newItem") {
-				//если хотим добавить новый элемент в список
-				//cd($post);
+				//если хотим добавить новый элемент в список				
 				if (!empty($post['itemText'])) {
 					//если новый элемент списка в запросе не пустой
 					$insertData = ['list_id' => $post['listId'], 'text' => $post['itemText']];
@@ -72,16 +80,35 @@ class Todo extends CI_Controller {
 					$updadeData = ['text' => $post['itemText']];
 					$this->common->updateItem('items', $selectors, $updadeData);
 				}
-			} elseif ($post['requestType'] == "addImage") {
-				//добавление или замена картинки к элементу списка
+			} 
 
-			} elseif ($post['requestType'] == "deleteIimage") {
-				//удаление картинки
+			//cd($_FILES);
+			$config['file_name']            = md5(mt_rand(1000, 100000)); 
+			$config['upload_path']          = './uploads/';
+			$config['allowed_types']        = 'gif|jpg|png';
+			$this->load->library('upload', $config);
+			if ($this->upload->do_upload('fileUpload')) {
+				$data = $this->upload->data();
+				
+				$itemId = $post['itemId'];
+				//cd($itemId);
+				//$itemImage = $this->common->getItem('images', ['item_id' => $itemId]);
+				//cd($itemImage);
+
+				$dbData = ['image_name' => $data['file_name'], 'item_id' => $itemId];
+				if ($itemImage = $this->common->getItem('images', ['item_id' => $itemId])) {
+					$selectors = ['id' => $itemImage['id']];
+					$this->common->updateItem('images', $selectors, $dbData);
+				} else {					
+					$this->common->addItem('images', $dbData);
+				}
+
+				
 
 			}
 
 
-			$items = $this->common->getItems('items', ['list_id' => (int)$id]);
+			$items = $this->common->getItems('items', ['list_id' => $post['listId']]);
 			//cd($listItems);	
 			$responce = [
 				'sucsess' => true, 
@@ -93,11 +120,6 @@ class Todo extends CI_Controller {
 			exit;
 
 		}
-
-		$this->load->view('header');
-		$this->load->view('logoutNav');
-		$this->load->view('listItems', $viewData);
-		$this->load->view('footer');
 	}
 
 	public function deleteList($id) {
