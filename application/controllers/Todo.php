@@ -47,36 +47,31 @@ class Todo extends CI_Controller {
 
 	public function list($id) {
 		$viewData['list'] =  $this->common->getItem('lists', ['id' => (int)$id]);
-
+		if ($viewData['list']['user_id'] != $this->user['id']) {
+			redirect('/todo');
+			//пока так не пускаю в чужие списки
+		}
 		//cd($viewData['list']);
 
 		if ($post = $this->input->post()) {
 			//cd($post);
 			if ($post['requestType'] == "newItem") {
 				//если хотим добавить новый элемент в список
-				if ($viewData['list']['user_id'] == $this->user['id']) {
-					//cd($post);
-					if (!empty($post['itemText'])) {
-						//если новый элемент списка в запросе не пустой
-						$insertList = ['list_id' => $post['listId'], 'text' => $post['itemText']];
-						$this->common->addItem('items', $insertList);
-					}
-
-					$items = $this->common->getItems('items', ['list_id' => (int)$id]);
-					//cd($listItems);	
-					$responce = [
-						'sucsess' => true, 
-						'items' => $items,
-					];
-
-					$json = json_encode($responce);
-					echo($json);
-					exit;
+				//cd($post);
+				if (!empty($post['itemText'])) {
+					//если новый элемент списка в запросе не пустой
+					$insertData = ['list_id' => $post['listId'], 'text' => $post['itemText']];
+					$this->common->addItem('items', $insertData);
 				}
 
 			} elseif ($post['requestType'] == "updateItem") {
 				//редактирование существующего элемента списка
-
+				if (!empty($post['itemText'])) {
+					//если новый элемент списка в запросе не пустой
+					$selectors = ['list_id' => $post['listId'], 'id' => $post['itemId']];
+					$updadeData = ['text' => $post['itemText']];
+					$this->common->updateItem('items', $selectors, $updadeData);
+				}
 			} elseif ($post['requestType'] == "addImage") {
 				//добавление или замена картинки к элементу списка
 
@@ -86,10 +81,18 @@ class Todo extends CI_Controller {
 			}
 
 
+			$items = $this->common->getItems('items', ['list_id' => (int)$id]);
+			//cd($listItems);	
+			$responce = [
+				'sucsess' => true, 
+				'items' => $items,
+			];
+
+			$json = json_encode($responce);
+			echo($json);
+			exit;
+
 		}
-
-		$viewData['listItems'] = $this->common->getItems('items', ['list_id' => (int)$id]);
-
 
 		$this->load->view('header');
 		$this->load->view('logoutNav');

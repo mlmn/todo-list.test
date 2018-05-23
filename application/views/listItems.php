@@ -26,7 +26,7 @@
 				</form>
 			</div>
 			<div class="col-md-2">
-				<button onclick="sendListItem()" id="button" class="btn btn-primary mb-2">Добавить пункт</button>
+				<button onclick="sendListItem('listForm')" id="button" class="btn btn-primary mb-2">Добавить пункт</button>
 			</div>
 		</div>
 	
