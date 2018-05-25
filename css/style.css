@@ -44,3 +44,14 @@
 .list-body {
 	padding: 0;
 }
+
+.item-image {
+	object-fit: cover;
+	width: 150px;
+	height: 150px;
+}
+
+.item-text {
+	margin-left: 10px;
+	vertical-align: top;
+}

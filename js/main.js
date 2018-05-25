@@ -28,7 +28,12 @@ function sendListItem(itemid) {
 			//console.log(responce);
 			var bodyHtml = ''; 
 			responce.items.forEach(function(item, i, arr) {
-				bodyHtml += '<li class="list-item" id="itemid' + item.id + '"><span onclick="editListItem(' + item.list_id +',' + item.id + ')">' + item.text + '</span></li><hr>';
+				bodyHtml += '<li class="list-item" id="itemid' + item.id + '">';
+				if (item.image_name != null) {
+					bodyHtml += '<a href="/uploads/' + item.image_name + item.image_ext +'" target="_blank"><img class="item-image" src="/uploads/' + item.image_name + item.image_ext +'"></a>';
+				}
+
+				bodyHtml +=	'<span class="item-text" onclick="editListItem(' + item.list_id +',' + item.id + ')">' + item.text + '</span></li><hr>';
 			});
 			document.querySelector('#itemText').value = '';
 			listBody.innerHTML = bodyHtml;

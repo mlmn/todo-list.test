@@ -50,12 +50,17 @@ class Common extends CI_Model {
 		$this->db->update($table, $updateData);
 	}
 
-	public function replaceItem(string $table, array $data) {
-		$replaceData = [];
-		foreach ($data as $col => $value) {
-			$replaceData[$col] = $this->db->escape_str($value);
+	public function getFullItems($listId) {
+		$this->db->select('itm.*, img.image_name, img.image_ext');
+		$this->db->from('items itm');
+		$this->db->join('images img', 'img.item_id = itm.id', 'left');
+		$this->db->where('itm.list_id', $this->db->escape_str($listId));
+		$query = $this->db->get();
+		if ($query->num_rows() > 0) {
+			return $query->result_array();
+		} else {
+			return [];
 		}
-		$this->db->replace($table, $replaceData);
 	}
 
 	public function hashPass(string $password) {

@@ -10,7 +10,6 @@ class Todo extends CI_Controller {
 			redirect('/user/login');
 		} else {
 			$this->user = $this->session->userdata('user');
-			//cd($this->user);
 		}
 	}
 
@@ -35,8 +34,6 @@ class Todo extends CI_Controller {
 			$newListId = $this->common->addItem('lists', $listData);
 			redirect('/todo/list/' . $newListId);
 		}
-
-
 		$viewData['lists'] = $this->common->getItems('lists', ['user_id' => $this->user['id'], 'del' => 0]);
 
 		$this->load->view('header');
@@ -51,10 +48,6 @@ class Todo extends CI_Controller {
 			redirect('/todo');
 			//пока так не пускаю в чужие списки
 		}
-		//cd($viewData['list']);
-
-
-
 		$this->load->view('header');
 		$this->load->view('logoutNav');
 		$this->load->view('listItems', $viewData);
@@ -63,52 +56,43 @@ class Todo extends CI_Controller {
 
 	public function ajax() {
 		if ($post = $this->input->post()) {
-			//cd($post);
-			if ($post['requestType'] == "newItem") {
-				//если хотим добавить новый элемент в список				
-				if (!empty($post['itemText'])) {
-					//если новый элемент списка в запросе не пустой
+			if (!empty($post['itemText'])) {
+				if ($post['requestType'] == "newItem") {
+					//если хотим добавить новый элемент в список
 					$insertData = ['list_id' => $post['listId'], 'text' => $post['itemText']];
 					$this->common->addItem('items', $insertData);
-				}
 
-			} elseif ($post['requestType'] == "updateItem") {
-				//редактирование существующего элемента списка
-				if (!empty($post['itemText'])) {
-					//если новый элемент списка в запросе не пустой
+				} elseif ($post['requestType'] == "updateItem") {
+					//редактирование существующего элемента списка
 					$selectors = ['list_id' => $post['listId'], 'id' => $post['itemId']];
 					$updadeData = ['text' => $post['itemText']];
 					$this->common->updateItem('items', $selectors, $updadeData);
-				}
-			} 
-
-			//cd($_FILES);
+					
+				} 
+			}
+			//аплоад файла начало
 			$config['file_name']            = md5(mt_rand(1000, 100000)); 
 			$config['upload_path']          = './uploads/';
 			$config['allowed_types']        = 'gif|jpg|png';
 			$this->load->library('upload', $config);
 			if ($this->upload->do_upload('fileUpload')) {
 				$data = $this->upload->data();
-				
+				//cd($data);
 				$itemId = $post['itemId'];
-				//cd($itemId);
-				//$itemImage = $this->common->getItem('images', ['item_id' => $itemId]);
-				//cd($itemImage);
 
-				$dbData = ['image_name' => $data['file_name'], 'item_id' => $itemId];
+				$dbData = ['image_name' => $data['file_name'], 'item_id' => $itemId, 'image_ext' => $data['file_ext']];
+				
 				if ($itemImage = $this->common->getItem('images', ['item_id' => $itemId])) {
+					//убрать это услвоие когда нужно будет поддерживать много картинок для каждого поста
 					$selectors = ['id' => $itemImage['id']];
 					$this->common->updateItem('images', $selectors, $dbData);
 				} else {					
 					$this->common->addItem('images', $dbData);
 				}
-
-				
-
 			}
+			//аплоад файла конец
 
-
-			$items = $this->common->getItems('items', ['list_id' => $post['listId']]);
+			$items = $this->common->getFullItems($post['listId']);
 			//cd($listItems);	
 			$responce = [
 				'sucsess' => true, 
