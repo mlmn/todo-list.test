@@ -13,6 +13,12 @@ class Todo extends CI_Controller {
 		}
 	}
 
+	public function test() {
+		$id = 27;
+		$items = $this->common->getFullItems($id);
+		cd($items);
+	}
+
 	public function index()	{
 
 		$this->form_validation->set_error_delimiters('<div class="list-error">', '</div><hr>');
@@ -64,33 +70,53 @@ class Todo extends CI_Controller {
 
 				} elseif ($post['requestType'] == "updateItem") {
 					//редактирование существующего элемента списка
+					$updadeData = [];
+
+					//работа с тeгами
+					if(!empty($post['itemTags'])) {
+						$newTags = explode(" ", $post['itemTags']);						
+						//решаем вопрос дублирования тагов ценой 1 доп запроса в базу
+						$existingTagsToItems = $this->common->getItems('tags_to_items', ['item_id' => $post['itemId']]);
+						$func = function(array $tagToItem) {
+							return $tagToItem['tag_id'];
+						};
+						$eixstingTags = array_map($func, $existingTagsToItems);
+
+						foreach($newTags as $tagName) {
+							if(!empty($tagName)) {
+								$tagId = $this->common->addTag($tagName);
+								if(!in_array($tagId, $eixstingTags)) {
+									$insertData = ['item_id' => $post['itemId'], 'tag_id' => $tagId];
+									$this->common->addItem('tags_to_items', $insertData);
+								}
+
+							}
+						}
+					}					
+					//работа с тегами
+
+					//аплоад файла начало
+					$config['file_name']            = md5(mt_rand(1000, 100000)); 
+					$config['upload_path']          = './uploads/';
+					$config['allowed_types']        = 'gif|jpg|png';
+					$this->load->library('upload', $config);
+					if ($this->upload->do_upload('fileUpload')) {
+						$data = $this->upload->data();
+						$updadeData['image_name'] = $data['raw_name'];
+						$updadeData['image_ext'] = $data['file_ext'];				
+					}
+					//аплоад файла конец
+					if (!empty($post['itemText'])) {
+						$updadeData['text'] = $post['itemText'];
+					}
+
 					$selectors = ['list_id' => $post['listId'], 'id' => $post['itemId']];
-					$updadeData = ['text' => $post['itemText']];
+
 					$this->common->updateItem('items', $selectors, $updadeData);
-					
 				} 
 			}
-			//аплоад файла начало
-			$config['file_name']            = md5(mt_rand(1000, 100000)); 
-			$config['upload_path']          = './uploads/';
-			$config['allowed_types']        = 'gif|jpg|png';
-			$this->load->library('upload', $config);
-			if ($this->upload->do_upload('fileUpload')) {
-				$data = $this->upload->data();
-				//cd($data);
-				$itemId = $post['itemId'];
 
-				$dbData = ['image_name' => $data['file_name'], 'item_id' => $itemId, 'image_ext' => $data['file_ext']];
-				
-				if ($itemImage = $this->common->getItem('images', ['item_id' => $itemId])) {
-					//убрать это услвоие когда нужно будет поддерживать много картинок для каждого поста
-					$selectors = ['id' => $itemImage['id']];
-					$this->common->updateItem('images', $selectors, $dbData);
-				} else {					
-					$this->common->addItem('images', $dbData);
-				}
-			}
-			//аплоад файла конец
+
 
 			$items = $this->common->getFullItems($post['listId']);
 			//cd($listItems);	

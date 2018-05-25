@@ -54,4 +54,25 @@
 .item-text {
 	margin-left: 10px;
 	vertical-align: top;
+	min-height: 130px;
+}
+.item-text-container {
+	min-height: 130px;
+}
+
+.item-tags {
+	margin-left: 10px;
+
+}
+.item-tags-container {
+	text-align: right;
+}
+
+.item-image-container {
+	float:left;
+}
+.item-body-container {
+	min-height: 150px;
+	/*position: relative;*/
+	/*float:left;*/
 }
